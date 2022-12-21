@@ -1,0 +1,7 @@
+nline:
+  address-pools:
+    - addresses:
+        - %s
+      name: default
+      protocol: layer2
+

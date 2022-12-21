@@ -1,0 +1,13 @@
+provider: rfc2136
+serviceTypeFilter:
+  - LoadBalancer
+  - NodePort
+  - ExternalName
+rfc2136:
+  host: %s
+  port: %s
+  zone: %s
+  tsigAxfr: false
+  tsigSecretAlg: ""
+  tsigKeyname: ""
+
