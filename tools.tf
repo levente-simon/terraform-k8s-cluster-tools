@@ -49,7 +49,7 @@ resource "helm_release" "metallb" {
 }
 
 
-resource "kubernetes_manifest" "ca_mgmt_cluster_issuer" {
+resource "kubernetes_manifest" "ip_address_pool" {
   depends_on = [ helm_release.metallb ]
   count      = var.enable_metallb ? 1 : 0
 
@@ -62,6 +62,23 @@ resource "kubernetes_manifest" "ca_mgmt_cluster_issuer" {
     }
     "spec" = {
       "addresses" = [ var.metallb_address_pool ]
+    }
+  }
+}
+
+resource "kubernetes_manifest" "l2_advertisement" {
+  depends_on = [ helm_release.metallb ]
+  count      = var.enable_metallb ? 1 : 0
+
+  manifest   = {
+    "apiVersion" = "metallb.io/v1beta1"
+    "kind"       = "L2Advertisement"
+    "metadata" = {
+      "name"      = "l2adv"
+      "namespace" = "metallb"
+    }
+    "spec" = {
+      "ipAddressPools" = [ "pool" ]
     }
   }
 }
