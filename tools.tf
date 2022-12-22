@@ -46,9 +46,23 @@ resource "helm_release" "metallb" {
   chart            = "metallb"
   namespace        = "metallb"
   create_namespace = true
+}
 
-  values = [ format(file("${path.module}/etc/metallb-config.yaml"),
-                 var.metallb_address_pool) ]
+
+resource "kubernetes_manifest" "ca_mgmt_cluster_issuer" {
+  depends_on = [ helm_release.metallb ]
+
+  manifest   = {
+    "apiVersion" = "metallb.io/v1beta1"
+    "kind"       = "IPAddressPool"
+    "metadata" = {
+      "name"      = "pool"
+      "namespace" =  "metallb"
+    }
+    "spec" = {
+      "addresses" = [ var.metallb_address_pool ]
+    }
+  }
 }
 
 # external-dns
