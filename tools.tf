@@ -51,6 +51,7 @@ resource "helm_release" "metallb" {
 
 resource "kubernetes_manifest" "ca_mgmt_cluster_issuer" {
   depends_on = [ helm_release.metallb ]
+  count      = var.enable_metallb ? 1 : 0
 
   manifest   = {
     "apiVersion" = "metallb.io/v1beta1"
