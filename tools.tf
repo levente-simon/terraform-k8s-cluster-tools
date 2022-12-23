@@ -46,41 +46,71 @@ resource "helm_release" "metallb" {
   chart            = "metallb"
   namespace        = "metallb"
   create_namespace = true
+  wait             = true
 }
 
+#resource "kubernetes_manifest" "ip_address_pool" {
+#  depends_on = [ helm_release.metallb ]
+#  count      = var.enable_metallb ? 1 : 0
+#
+#  manifest   = {
+#    "apiVersion" = "metallb.io/v1beta1"
+#    "kind"       = "IPAddressPool"
+#    "metadata" = {
+#      "name"      = "pool"
+#      "namespace" = "metallb"
+#    }
+#    "spec" = {
+#      "addresses" = [ "${var.metallb_address_pool}" ]
+#    }
+#  }
+#}
+#
+#resource "kubernetes_manifest" "l2_advertisement" {
+#  depends_on = [ kubernetes_manifest.ip_address_pool ]
+#  count      = var.enable_metallb ? 1 : 0
+#
+#  manifest   = {
+#    "apiVersion" = "metallb.io/v1beta1"
+#    "kind"       = "L2Advertisement"
+#    "metadata" = {
+#      "name"      = "l2adv"
+#      "namespace" = "metallb"
+#    }
+#    "spec" = {
+#      "ipAddressPools" = [ "pool" ]
+#    }
+#  }
+#}
 
-resource "kubernetes_manifest" "ip_address_pool" {
+resource "kubectl_manifest" "ip_address_pool" {
   depends_on = [ helm_release.metallb ]
   count      = var.enable_metallb ? 1 : 0
-
-  manifest   = {
-    "apiVersion" = "metallb.io/v1beta1"
-    "kind"       = "IPAddressPool"
-    "metadata" = {
-      "name"      = "pool"
-      "namespace" =  "metallb"
-    }
-    "spec" = {
-      "addresses" = [ var.metallb_address_pool ]
-    }
-  }
+  yaml_body  = <<-EOT
+    apiVersion: metallb.io/v1beta1
+    kind: IPAddressPool
+    metadata:
+      name: pool
+      namespace: metallb
+    spec:
+      addresses:
+      - ${var.metallb_address_pool}
+    EOT
 }
 
-resource "kubernetes_manifest" "l2_advertisement" {
-  depends_on = [ helm_release.metallb ]
+resource "kubectl_manifest" "l2_advertisement" {
+  depends_on = [ kubectl_manifest.ip_address_pool ]
   count      = var.enable_metallb ? 1 : 0
-
-  manifest   = {
-    "apiVersion" = "metallb.io/v1beta1"
-    "kind"       = "L2Advertisement"
-    "metadata" = {
-      "name"      = "l2adv"
-      "namespace" = "metallb"
-    }
-    "spec" = {
-      "ipAddressPools" = [ "pool" ]
-    }
-  }
+  yaml_body  = <<-EOT
+    apiVersion: metallb.io/v1beta1
+    kind: L2Advertisement
+    metadata:
+      name: l2adv
+      namespace: metallb
+    spec:
+      ipAddressPools:
+      - pool
+    EOT
 }
 
 # external-dns
