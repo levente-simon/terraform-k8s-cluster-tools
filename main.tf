@@ -1,7 +1,9 @@
 terraform {
-     kubectl = {
+  required_providers {
+    kubectl = {
       source  = "gavinbunney/kubectl"
     }
+  }
 }
 
 provider "kubernetes" {
