@@ -33,6 +33,7 @@ resource "helm_release" "longhorn" {
 
   values = [ format(file("${path.module}/etc/longhorn-config.yaml"),
                  var.longhorn_data_path,
+                 var.longhorn_default_replica_count,
                  var.longhorn_default_replica_count) ]
 }
 
