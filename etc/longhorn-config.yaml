@@ -4,10 +4,5 @@ defaultSettings:
 persistence:
   defaultClassReplicaCount: %d
   defaultFsType: xfs
-service:
-  ui:
-    type: LoadBalancer
-  manager:
-    type: LoadBalancer
 
 
