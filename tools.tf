@@ -11,7 +11,7 @@ resource "helm_release" "cert_manager" {
 
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager"
-  namespace        = "cert-manager"
+  namespace        = var.cert_manager_namespace
   create_namespace = true
 
   set {
@@ -28,7 +28,7 @@ resource "helm_release" "longhorn" {
 
   repository       = "https://charts.longhorn.io"
   chart            = "longhorn"
-  namespace        = "longhorn"
+  namespace        = var.longhorn_namespace
   create_namespace = true
 
   values = [ format(file("${path.module}/etc/longhorn-config.yaml"),
@@ -45,7 +45,7 @@ resource "helm_release" "metallb" {
 
   repository       = "https://charts.bitnami.com/bitnami"
   chart            = "metallb"
-  namespace        = "metallb"
+  namespace        = var.metallb_namespace
   create_namespace = true
   wait             = true
 }
@@ -122,7 +122,7 @@ resource "helm_release" "external_dns" {
 
   repository       = "https://charts.bitnami.com/bitnami"
   chart            = "external-dns"
-  namespace        = "external-dns"
+  namespace        = var.external_dns_namespace
   create_namespace = true
 
   values = [ format(file("${path.module}/etc/external-dns-config.yaml"),
